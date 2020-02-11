@@ -1,0 +1,16 @@
+name: xiorchestrate-xos-svc
+version: 0.1.1
+appVersion: 1.0.0-284
+description: xiorchestrate-xos-svc App for ccl
+icon: https://avatars1.githubusercontent.com/u/7809479
+keywords:
+- app
+- xiorchestrate-xos-svc
+- ccl
+home: https://appurl/xiorchestrate-xos-svc/
+sources:
+- https://github.com/mgunter-pivotal/ccl-uchart
+maintainers:
+- name: Mayuresh Krishna
+  email: makrishna@pivotal.io
+engine: gotpl

@@ -1,0 +1,86 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}
+      release: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+    spec:
+      {{- if .Values.securityContext.enabled }}
+      securityContext:
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+      {{- end}}
+      {{- if .Values.image.pullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.image.pullSecrets }}
+        - name: {{ . }}
+      {{- end}}
+      {{- end }}
+      containers:
+      - name: {{ template "fullname" . }}
+        image: {{ template "imagename" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        envFrom:
+          - configMapRef:
+              name: env-common
+          - configMapRef:
+              name: {{ template "fullname" . }}
+        resources:
+          requests:
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
+        ports:
+          {{- range $key, $val := .Values.service.port }}
+          - name: {{ $key }}
+            containerPort: {{ $val }}
+          {{- end}}
+        {{- if .Values.liveness.enabled}}
+        livenessProbe:
+          {{- if eq .Values.liveness.type "httpGet"}}
+          httpGet:
+            path: {{ .Values.liveness.path }}
+            port: {{ .Values.liveness.port }}
+          initialDelaySeconds: {{ .Values.liveness.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.liveness.timeoutSeconds }}
+          failureThreshold: {{ .Values.liveness.failureThreshold }}
+          {{- end}}
+          {{if eq .Values.liveness.type "tcpSocket"}}
+          tcpSocket:
+            port: {{ .Values.liveness.port }}
+          initialDelaySeconds: {{ .Values.liveness.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.liveness.timeoutSeconds }}
+          failureThreshold: {{ .Values.liveness.failureThreshold }}
+          {{- end}}
+        {{- end}}
+        {{- if .Values.readiness.enabled }}
+        readinessProbe:
+          {{- if eq .Values.readiness.type "httpGet"}}
+          httpGet:
+            path: {{ .Values.readiness.path }}
+            port: {{ .Values.readiness.port }}
+          initialDelaySeconds: {{ .Values.readiness.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.readiness.timeoutSeconds }}
+          failureThreshold: {{ .Values.readiness.failureThreshold }}
+          {{- end}}
+          {{if eq .Values.readiness.type "tcpSocket"}}
+          tcpSocket:
+            port: {{ .Values.readiness.port }}
+          initialDelaySeconds: {{ .Values.readiness.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.readiness.timeoutSeconds }}
+          failureThreshold: {{ .Values.readiness.failureThreshold }}
+          {{- end}}
+        {{- end}}

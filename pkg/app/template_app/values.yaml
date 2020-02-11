@@ -1,0 +1,124 @@
+## Global Docker image registry
+## Please, note that this will override the image registry for all the images, including dependencies, configured to use the global value
+##
+# global:
+#   imageRegistry:
+
+## CCL image version
+## ref: https://hub.docker.com/r/bitnami/tomcat/tags/
+##
+
+# Set this to the namespace where you want to deploy the App
+namespace: poseidon
+
+domain: DOMAIN
+
+image:
+  repository: REPO
+  tag: latest
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  # pullSecrets:
+  #   - myRegistrKeySecretName 
+
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+securityContext:
+  enabled: false
+  fsGroup: 1001
+  runAsUser: 1001
+
+## Specify a imagePullPolicy
+## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+##
+imagePullPolicy: IfNotPresent
+
+## Admin user
+## ref: https://github.com/bitnami/bitnami-docker-tomcat#creating-a-custom-user
+##
+tomcatUsername: user
+
+## Admin password
+## ref: https://github.com/bitnami/bitnami-docker-tomcat#creating-a-custom-user
+##
+# tomcatPassword:
+
+## Expose management services
+## ref: https://github.com/bitnami/charts/tree/master/bitnami/tomcat#configuration
+##
+tomcatAllowRemoteManagement: 0
+
+## Probes for Liveliness and Readiness - can be of type 'httpGet' or 'tcpSocket' tcpSocket doesn't need path
+#liveness:
+#  enabled: true
+#  type: tcpSocket
+#  path: /
+#  port: 8080
+#  initialDelaySeconds: 120
+#  timeoutSeconds: 5
+#  failureThreshold: 6
+
+#readiness:
+#  enabled: true
+#  type: tcpSocket
+#  path: 
+#  port: 8080
+#  initialDelaySeconds: 120
+#  timeoutSeconds: 5
+#  failureThreshold: 6
+
+
+## Ingress Port
+ingress:
+  port: 8080
+
+
+## Kubernetes configuration
+## For minikube, set this to NodePort, elsewhere use LoadBalancer
+##
+service:
+  type: LoadBalancer
+  # HTTP Port
+  port:
+    tcp-8080: 8080
+  ##
+  ## loadBalancerIP:
+  ## nodePorts:
+  ##   http: <to set explicitly, choose port between 30000-32767>
+  ##   https: <to set explicitly, choose port between 30000-32767>
+  nodePorts:
+    http: ""
+  ## Enable client source IP preservation
+  ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  ##
+  externalTrafficPolicy: Cluster
+
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  enabled: true
+  ## If defined, volume.beta.kubernetes.io/storage-class: <storageClass>
+  ## Default: volume.alpha.kubernetes.io/storage-class: default
+  ##
+  # storageClass:
+  accessMode: ReadWriteOnce
+  size: 8Gi
+
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+#resources:
+#  requests:
+#    memory: 512Mi
+#    cpu: 300m
+
+envars:
