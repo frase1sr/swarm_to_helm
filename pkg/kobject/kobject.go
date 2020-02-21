@@ -30,4 +30,5 @@ type ConvertOptions struct {
 	ServerURL                    string
 	AuthToken				   string
 	Out 						string
+	Filter                      string
 }

@@ -25,7 +25,8 @@ import (
 	//"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/swarm"
 	"encoding/json"
-	"os"
+	"helm.sh/helm/v3/pkg/chartutil"
+	//"os"
 
 )
 
@@ -44,28 +45,15 @@ func ValidateFlags(bundle string, args []string, cmd *cobra.Command, opt *kobjec
 
 // Convert transforms docker compose or dab file to k8s objects
 func Convert(opt kobject.ConvertOptions) {
-/*	fmt.Println(opt.ServerURL)
-	fmt.Println(opt.AuthToken)
 	services := GetServicesFromCluster(opt.ServerURL,opt.AuthToken)
-	for _,service := range services {
-            fmt.Printf("%#v\n", service.Spec.Name);
-	}*/
-	
-	// Read Write Mode
-	file, err := os.OpenFile("~/template_app/values.yaml", os.O_RDWR, 0644)
-     
-	if err != nil {
-		//log.Fatalf("failed opening file: %s", err)
-		fmt.Println("failed to open")
-	}
-	fmt.Printf("\nFile Name: %s", file.Name())
-
-	defer file.Close()
+	service := FindServiceFromFilter(services, opt.Filter)
+	fmt.Println(service.Spec.Name)
+	fmt.Println(create.defaultValues)
 }
 
 func GetServicesFromCluster(server string, token string) []swarm.Service {
 
-	response := MakeRequest(server,token,"/services")
+	response := MakeRequest(server,token,"/services", true)
 
 	if response != nil {
 		services := []swarm.Service{}
@@ -79,12 +67,24 @@ func GetServicesFromCluster(server string, token string) []swarm.Service {
 	return nil
 }
 
+func FindServiceFromFilter(services []swarm.Service, filter string) swarm.Service {
+	var foundService swarm.Service
+	for _,service := range services {
+		if filter == service.Spec.Name {
+			//fmt.Printf("%#v\n", service);
+			foundService = service
+		}
+	}
+	return foundService
+}
+
+
 func MakeRequest(server string, token string, endpoint string, isInsecure bool) []byte {
 	url := server + endpoint
 	method := "GET"
   
 	tr := &http.Transport{
-        TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
+        TLSClientConfig: &tls.Config{InsecureSkipVerify: isInsecure},
 	}
 	
 	client := &http.Client {Transport: tr}
@@ -103,13 +103,6 @@ func MakeRequest(server string, token string, endpoint string, isInsecure bool) 
 
 	return body
 }
-
-func ReplaceText(find string, replace string,data []bytes) []bytes
-{	
-	return bytes.Replace(input, []byte(find), []byte(replace), -1)
-}
-
-
 
 
 

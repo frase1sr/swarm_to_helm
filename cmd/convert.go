@@ -19,13 +19,18 @@ import (
 	//log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	//"github.com/helm/helm/cmd/helm/require"
+	//"github.com/helm/helm/pkg/chart"
+	//"github.com/helm/helm/pkg/chartutil"
+	//"github.com/helm/helm/pkg/helmpath"
 )
 // TODO: comment
 var (
-	ConvertServerURL                   string
-	ConvertAuthToken				   string
+	ConvertServerURL             string
+	ConvertAuthToken			 string
 	ConvertOpt                   kobject.ConvertOptions
-	ConvertOut                    string
+	ConvertOut                   string
+	ConvertFilter                string
 
 )
 
@@ -44,6 +49,7 @@ var convertCmd = &cobra.Command{
 			ServerURL:                   ConvertServerURL,
 			AuthToken:					 ConvertAuthToken,
 			Out:							 ConvertOut,
+			Filter:	                     ConvertFilter,
 		}
 
 		// Validate before doing anything else. Use "bundle" if passed in.
@@ -53,6 +59,7 @@ var convertCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Println("It's running")
 		app.Convert(ConvertOpt)
+
 	},
 }
 
@@ -63,7 +70,8 @@ func init() {
 
 	convertCmd.Flags().StringVar(&ConvertServerURL, "server-url", "https://localhost:9443", "please specify the base url")
 	convertCmd.Flags().StringVar(&ConvertAuthToken, "auth-token", "", "please specify the auth token")
-	convertCmd.Flags().StringVarP(&ConvertOut, "out", "o", "", "Specify a file name or directory to save objects to (if path does not exist, a file will be created)")
+	convertCmd.Flags().StringVar(&ConvertFilter, "filter", "individualjourney", "Filter for service name")
 
+	convertCmd.Flags().StringVarP(&ConvertOut, "out", "o", "", "Directory to save objects to (if path does not exist, a file will be created)")
 	RootCmd.AddCommand(convertCmd)
 }
