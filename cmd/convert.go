@@ -31,6 +31,7 @@ var (
 	ConvertOpt                   kobject.ConvertOptions
 	ConvertOut                   string
 	ConvertFilter                string
+	ConvertDeployService		 bool
 
 )
 
@@ -50,6 +51,8 @@ var convertCmd = &cobra.Command{
 			AuthToken:					 ConvertAuthToken,
 			Out:							 ConvertOut,
 			Filter:	                     ConvertFilter,
+			DeployService:				ConvertDeployService,
+
 		}
 
 		// Validate before doing anything else. Use "bundle" if passed in.
@@ -73,5 +76,7 @@ func init() {
 	convertCmd.Flags().StringVar(&ConvertFilter, "filter", "individualjourney", "Filter for service name")
 
 	convertCmd.Flags().StringVarP(&ConvertOut, "out", "o", "", "Directory to save objects to (if path does not exist, a file will be created)")
+	//convertCmd.Flags().BoolVarP(&ConvertDeployService, "deploy","d", false, "Deploy service")
+
 	RootCmd.AddCommand(convertCmd)
 }

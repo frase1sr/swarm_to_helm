@@ -31,4 +31,5 @@ type ConvertOptions struct {
 	AuthToken				   string
 	Out 						string
 	Filter                      string
+	DeployService				bool
 }
